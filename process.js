@@ -14,7 +14,7 @@ const isTitleValid = (file) => {
   else return false
 }
 const isAuthorValid = (file) => {
-  if (typeof file.author === 'string' && file.author.length <= 100) return true
+  if (file.author != '' && typeof file.author === 'string' && file.author.length <= 100) return true
   else return false
 }
 const isModifiedAtValid = (file) => {
@@ -69,24 +69,25 @@ const validator = (data) => {
     isPublishedAtValid(parsedData) &&
     isModifiedAtValid(parsedData)
   ) {
-    console.log(true)
+    console.log(parsedData.id, true)
   } else {
-    console.log(false)
+    console.log(parsedData.id, false)
   }
 }
 
 const promisifiedReadDir = promisify(readdir)
 const promisifiedReadFile = promisify(readFile)
 
-async function readAndValidateData(path) {
+const readAndValidateData = async (path) => {
   try {
-    const files = await promisifiedReadDir(path, {encoding: 'utf-8'})
+    const files = await promisifiedReadDir(path, 'utf-8')
 
     for (const file of files) {
-      const fileContent = await promisifiedReadFile(`${path}${file}`, {encoding: 'utf-8'})
+      const fileContent = await promisifiedReadFile(`${path}${file}`, 'utf-8')
       validator(fileContent)
     }
-  } catch (err) {}
+  } catch (err) {
+    console.log('There was an error', err)
+  }
 }
-
 readAndValidateData(path)

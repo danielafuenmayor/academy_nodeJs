@@ -24,6 +24,7 @@
     "prettier": "^2.4.0"
   },
   "dependencies": {
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "yup": "^0.32.9"
   }
 }
