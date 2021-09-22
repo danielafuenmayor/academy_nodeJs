@@ -1,52 +1,31 @@
+/* eslint-disable indent */
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
 const {readdir, readFile} = require('fs')
 const {promisify} = require('util')
-const moment = require('moment')
+const yup = require('yup')
 const path = './src/dataset/'
+const today = new Date()
 
-const isIdValid = (file) => {
-  if (typeof file.id === 'string' && file.id.length === 36) return true
-}
-const isTitleValid = (file) => {
-  if (typeof file.title === 'string' && file.title.length <= 255) return true
-}
-const isAuthorValid = (file) => {
-  if (file.author != '' && typeof file.author === 'string' && file.author.length <= 100) return true
-}
-const isModifiedAtValid = (file) => {
-  const modifiedAtDate = moment(file.date)
-  if (modifiedAtDate !== undefined && modifiedAtDate !== null && moment(modifiedAtDate, 'mmm/dd/yyyy')) return true
-}
-const isPublishedAtValid = (file) => {
-  const publishedDate = moment(file.date)
+const schema = yup.object().shape({
+  id: yup.string().min(36).max(36).required(),
+  title: yup.string().max(255).required(),
+  publishedAt: yup.date('mm/dd/yyyy').max(today).nullable(),
+  url: yup.string().when('publishedAt', {
+    is: (value) => !!value,
+    then: yup.string().url().matches(/https/).required(),
+  }),
+  keywords: yup.array().min(1).max(3),
+  modifiedAt: yup.date('mm/dd/yyyy').max(today).required(),
+  author: yup.string().max(100).required(),
+  readMins: yup.number().min(1).max(20).required(),
+  source: yup
+    .string()
+    .matches(/(BLOG|TWEET|ARTICLE|NEWSPAPER)/)
+    .required(),
+})
 
-  if (publishedDate === null || publishedDate === undefined) return true
-  else if (moment(publishedDate, 'mmm/dd/yyyy')) return true
-}
-const isUrlValid = (file) => {
-  const publishedDate = file.publishedAt
-  const protocol = 'https://'
-
-  if (file.url === '' || file.url === null || file.url === undefined) {
-    return !publishedDate
-  } else if (file.url.substr(0, 8) === protocol) {
-    return true
-  }
-}
-const isKeywordsValid = (file) => {
-  if (Array.isArray(file.keywords) && file.keywords.length > 0 && file.keywords.length <= 3) return true
-}
-const isReadMinsValid = (file) => {
-  if (file.readMins >= 1 && file.readMins < 20) return true
-}
-const isSourceValid = (file) => {
-  if (file.source === 'ARTICLE' || file.source === 'BLOG' || file.source === 'TWEET' || file.source === 'NEWSPAPER') {
-    return true
-  }
-}
-
-const validator = (data) => {
+const validator = async (data) => {
   let parsedData
 
   try {
@@ -55,19 +34,12 @@ const validator = (data) => {
     console.log(err)
   }
 
-  if (
-    isIdValid(parsedData) &&
-    isTitleValid(parsedData) &&
-    isAuthorValid(parsedData) &&
-    isUrlValid(parsedData) &&
-    isKeywordsValid(parsedData) &&
-    isReadMinsValid(parsedData) &&
-    isSourceValid(parsedData) &&
-    isPublishedAtValid(parsedData) &&
-    isModifiedAtValid(parsedData)
-  ) {
-    console.log(parsedData.id, true)
-  } else console.log(parsedData.id, false)
+  try {
+    await schema.validate(parsedData)
+    console.log(true)
+  } catch (err) {
+    console.log(false)
+  }
 }
 
 const promisifiedReadDir = promisify(readdir)
