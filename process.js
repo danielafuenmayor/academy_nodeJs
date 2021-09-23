@@ -1,9 +1,14 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable indent */
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-const {readdir, readFile} = require('fs')
+const {readdir, readFile, writeFile} = require('fs')
 const {promisify} = require('util')
+const promisifiedReadDir = promisify(readdir)
+const promisifiedReadFile = promisify(readFile)
+const promisifiedWriteFile = promisify(writeFile)
 const yup = require('yup')
+
 const path = './src/dataset/'
 const today = new Date()
 
@@ -25,7 +30,7 @@ const schema = yup.object().shape({
     .required(),
 })
 
-const validator = async (data) => {
+const validate = async (data) => {
   let parsedData
 
   try {
@@ -36,25 +41,48 @@ const validator = async (data) => {
 
   try {
     await schema.validate(parsedData)
-    console.log(true)
+    return true
   } catch (err) {
-    console.log(false)
+    return false
+    console.log(err)
   }
 }
 
-const promisifiedReadDir = promisify(readdir)
-const promisifiedReadFile = promisify(readFile)
-
-const readAndValidateData = async (path) => {
+const writeData = async (validFilesArray, invalidFilesArray) => {
   try {
-    const files = await promisifiedReadDir(path, 'utf-8')
+    await promisifiedWriteFile('./src/db.json', JSON.stringify(validFilesArray) + '\n', {
+      encoding: 'utf-8',
+      flag: 'a',
+    })
+    await promisifiedWriteFile('./src/invalid.json', JSON.stringify(invalidFilesArray), {
+      encoding: 'utf-8',
+      flag: 'a',
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const processData = async (path) => {
+  let fileContent
+  let files
+  const validFilesArray = []
+  const invalidFilesArray = []
+
+  try {
+    files = await promisifiedReadDir(path, 'utf-8')
 
     for (const file of files) {
-      const fileContent = await promisifiedReadFile(`${path}${file}`, 'utf-8')
-      validator(fileContent)
+      fileContent = await promisifiedReadFile(`${path}${file}`, 'utf-8')
+
+      const isFileValid = await validate(fileContent)
+
+      isFileValid ? validFilesArray.push(fileContent) : invalidFilesArray.push(fileContent)
     }
   } catch (err) {
     console.log('There was an error', err)
   }
+  writeData(validFilesArray, invalidFilesArray)
 }
-readAndValidateData(path)
+
+processData(path)
