@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --inspect=0.0.0.0:9229 index.js",
-    "process": "node process.js"
+    "process": "node process.js",
+    "server": "node server.js"
   },
   "repository": {
     "type": "git",

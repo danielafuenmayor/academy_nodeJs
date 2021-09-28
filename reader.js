@@ -21,7 +21,7 @@ const readData = async (path) => {
 
       const isFileValid = await validate(fileContent)
 
-      isFileValid ? validFilesArray.push(fileContent) : invalidFilesArray.push(fileContent)
+      isFileValid ? validFilesArray.push(JSON.parse(fileContent)) : invalidFilesArray.push(JSON.parse(fileContent))
     }
   } catch (err) {
     console.log('There was an error', err)
