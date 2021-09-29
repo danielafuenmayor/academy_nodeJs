@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --inspect=0.0.0.0:9229 index.js",
     "process": "node process.js",
-    "server": "node server.js"
+    "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "prettier": "^2.4.0"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "moment": "^2.29.1",
     "yup": "^0.32.9"
   }
