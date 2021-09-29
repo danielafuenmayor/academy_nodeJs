@@ -3,7 +3,7 @@ const {readFile} = require('fs')
 const promisifiedReadFile = promisify(readFile)
 
 const dataReader = async (path) => {
-  const data = await promisifiedReadFile('./src/db.json', 'utf-8')
-  return data
+  const data = await promisifiedReadFile(path, 'utf-8')
+  return JSON.parse(data)
 }
 module.exports = dataReader
