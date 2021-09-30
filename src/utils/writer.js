@@ -4,21 +4,16 @@
 /* eslint-disable max-len */
 const {writeFile} = require('fs')
 const {promisify} = require('util')
+const path = require('path')
 const promisifiedWriteFile = promisify(writeFile)
-const {validFilesArray, invalidFilesArray} = require('./arrays')
 
-const writeData = async () => {
+const write = async (articles) => {
   try {
-    await promisifiedWriteFile('./src/db.json', JSON.stringify(validFilesArray), {
+    await promisifiedWriteFile(path.resolve(__dirname, '../db/db.json'), JSON.stringify(articles), {
       encoding: 'utf-8',
-      flag: 'a',
-    })
-    await promisifiedWriteFile('./src/invalid.json', JSON.stringify(invalidFilesArray), {
-      encoding: 'utf-8',
-      flag: 'a',
     })
   } catch (err) {
     console.log(err)
   }
 }
-module.exports = writeData
+module.exports = write

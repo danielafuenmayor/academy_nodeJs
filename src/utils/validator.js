@@ -22,19 +22,11 @@ const schema = yup.object().shape({
 })
 
 const validate = async (data) => {
-  let parsedData
-
   try {
-    parsedData = JSON.parse(data)
-  } catch (err) {
-    console.log(err)
-  }
-
-  try {
-    await schema.validate(parsedData)
+    await schema.validate(data)
     return true
   } catch (err) {
-    return false
+    return err.errors
   }
 }
 module.exports = validate
