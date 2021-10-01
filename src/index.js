@@ -3,6 +3,7 @@ const app = express()
 const router = require('./routes')
 const performanceMiddleware = require('./middlewares/performance')
 
+app.use(express.json())
 app.use(performanceMiddleware)
 app.use('/articles', router.articlesRouter)
 app.all('*', (req, res) => {
