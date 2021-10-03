@@ -1,13 +1,12 @@
+/* eslint-disable max-len */
 /* eslint-disable new-cap */
 const {Router} = require('express')
 const articlesRouter = Router()
 const path = require('path')
 const read = require('../utils/reader')
-const {v4: uuidv4} = require('uuid')
-const moment = require('moment')
-const validate = require('../utils/validator')
 const write = require('../utils/writer')
-const assignNewValues = require('../utils/assignValues')
+const createNewArticle = require('../utils/createNewArticle')
+const editArticle = require('../utils/editArticle')
 
 articlesRouter.get('/', async (req, res) => {
   try {
@@ -36,31 +35,18 @@ articlesRouter.get('/:id', async (req, res) => {
   }
 })
 
-articlesRouter.post('/post', async (req, res) => {
-  const newArticle = {
-    ...req.body,
-    id: uuidv4(),
-    publishedAt: moment().format('MM/DD/YYYY'),
-    modifiedAt: moment().format('MM/DD/YYYY'),
-  }
-
+articlesRouter.post('/', async (req, res) => {
   try {
-    const isArticleValid = await validate(newArticle)
-    if (isArticleValid === true) {
-      const articles = await read(path.resolve(__dirname, '../db/db.json'))
-      articles.push(newArticle)
-      write(articles)
-      res.status(200).send('Sucessfully wrote a new article')
-      return
-    }
-    return res.status(400).send(isArticleValid)
+    const createResult = await createNewArticle(req, res)
+    if (createResult === true) res.status(200).send('Sucessfully wrote a new article')
+    else return res.status(400).send(createResult)
   } catch (err) {
     res.status(500).json(err)
     return
   }
 })
 
-articlesRouter.patch('/patch', async (req, res) => {
+articlesRouter.patch('/', async (req, res) => {
   const {id} = req.body
   const articles = await read(path.resolve(__dirname, '../db/db.json'))
 
@@ -68,30 +54,45 @@ articlesRouter.patch('/patch', async (req, res) => {
     const found = articles.find((e) => e.id === id)
     if (!found) res.status(404).send('Article not found')
     else {
-      const editedArticle = {
-        ...found,
-        ...req.body,
-        modifiedAt: moment().format('MM/DD/YYYY'),
-        publishedAt: found.publishedAt,
-      }
       try {
-        const isArticleValid = await validate(editedArticle)
-        if (isArticleValid === true) {
-          assignNewValues(req, found)
-          write(articles)
-          res.status(200).send(`Successfully modified an article`)
-          return
-        }
-        res.status(400).send(isArticleValid)
+        const editResult = await editArticle(req, articles, found)
+        if (editResult === true) res.status(200).send(`Successfully modified an article`)
+        else return res.status(400).send(editResult)
       } catch (err) {
-        res.status(500).json(err)
+        res.status(500).json
       }
     }
     return
   } else res.status(400).send('Id is required')
 })
 
-articlesRouter.delete('/delete', async (req, res) => {
+articlesRouter.put('/', async (req, res) => {
+  const {id} = req.body
+
+  const articles = await read(path.resolve(__dirname, '../db/db.json'))
+  const found = articles.find((e) => e.id === id)
+
+  if (!found) {
+    try {
+      const createResult = await createNewArticle(req, res)
+      if (createResult === true) res.status(200).send('Sucessfully wrote a new article')
+      else return res.status(400).send(createResult)
+    } catch (err) {
+      res.status(500).json(err)
+      return
+    }
+  } else {
+    try {
+      const editResult = await editArticle(req, articles, found)
+      if (editResult === true) res.status(200).send(`Successfully modified an article`)
+      else return res.status(400).send(editResult)
+    } catch (err) {
+      res.status(500).json
+    }
+  }
+})
+
+articlesRouter.delete('/', async (req, res) => {
   const {id} = req.body
   if (id) {
     const articles = await read(path.resolve(__dirname, '../db/db.json'))
@@ -103,6 +104,7 @@ articlesRouter.delete('/delete', async (req, res) => {
       write(articles)
       res.status(200).send('Successfully deleted an article')
     }
-  }
+  } else res.status(404).send('Id is required')
 })
+
 module.exports = articlesRouter
