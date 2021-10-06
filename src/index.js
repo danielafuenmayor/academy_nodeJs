@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const router = require('./routes')
 const performanceMiddleware = require('./middlewares/performance')
+require('./database')
 
 app.use(express.json())
 app.use(performanceMiddleware)

@@ -4,7 +4,6 @@ const yup = require('yup')
 const today = new Date()
 
 const schema = yup.object().shape({
-  id: yup.string().min(36).max(36).required(),
   title: yup.string().max(255).required(),
   publishedAt: yup.date('mm/dd/yyyy').max(today).nullable(),
   url: yup.string().when('publishedAt', {
