@@ -5,7 +5,6 @@ const articlesRouter = Router()
 const moment = require('moment')
 const createNewArticle = require('../utils/createNewArticle')
 const editArticle = require('../utils/editArticle')
-const deleteArticle = require('../utils/deleteArticle')
 const articleModel = require('../database/articles')
 
 articlesRouter.get('/', async (req, res) => {
@@ -39,7 +38,7 @@ articlesRouter.get('/:id', async (req, res) => {
 articlesRouter.post('/', async (req, res) => {
   try {
     const createResult = await createNewArticle(req)
-    if (createResult === true) res.status(200).send('Sucessfully wrote a new article')
+    if (createResult === true) res.status(200).send('Sucessfully created a new article')
     else return res.status(400).send(createResult)
   } catch (err) {
     res.status(500).json(err)
@@ -64,7 +63,7 @@ articlesRouter.patch('/:id', async (req, res) => {
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
     try {
       await articleModel.update(id, editedArticle)
-      res.status(200).send(`Successfully modified an article`)
+      res.status(200).send('Successfully modified an article')
     } catch (err) {
       res.status(500).json(err)
     }
@@ -80,7 +79,7 @@ articlesRouter.put('/:id', async (req, res) => {
     if (found === null) {
       try {
         const createResult = await createNewArticle(req)
-        if (createResult === true) res.status(200).send('Sucessfully wrote a new article')
+        if (createResult === true) res.status(200).send('Sucessfully created a new article')
         else return res.status(400).send(createResult)
       } catch (err) {
         res.status(500).json(err)
@@ -90,7 +89,7 @@ articlesRouter.put('/:id', async (req, res) => {
 
     try {
       const editResult = await editArticle(id, req)
-      if (editResult) res.status(200).send(`Successfully modified an article`)
+      if (editResult) res.status(200).send('Successfully modified an article')
       else return res.status(200).send(editResult)
     } catch (err) {
       res.status(500).json(err)
@@ -103,10 +102,9 @@ articlesRouter.delete('/:id', async (req, res) => {
 
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
     try {
-      const deleteResult = await deleteArticle(id)
-      if (deleteResult === true) {
-        res.status(200).send('Successfully deleted an article')
-      } else res.status(404).send('Article not found')
+      const deleteResult = await articleModel.delete(id)
+      if (deleteResult !== null) res.status(200).send('Successfully deleted an article')
+      else res.status(404).send('Article not found')
     } catch (err) {
       console.log(err)
     }

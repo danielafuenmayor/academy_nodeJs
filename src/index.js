@@ -7,6 +7,7 @@ require('./database')
 app.use(express.json())
 app.use(performanceMiddleware)
 app.use('/articles', router.articlesRouter)
+app.use('/authors', router.authorsRouter)
 app.all('*', (req, res) => {
   res.status(404).send('Not found')
   return
