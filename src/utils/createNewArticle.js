@@ -1,4 +1,4 @@
-const validate = require('./validator')
+const validate = require('./articleValidator')
 const moment = require('moment')
 const articleModel = require('../database/articles')
 
