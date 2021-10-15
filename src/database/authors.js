@@ -19,6 +19,12 @@ class Authors {
   get(id) {
     return AuthorsModel.findById(id).exec()
   }
+  getByName(name) {
+    return AuthorsModel.find({name: name}).exec()
+  }
+  getByArticleId(articleId) {
+    return AuthorsModel.find({articles: articleId}).exec()
+  }
   update(id, author) {
     return AuthorsModel.findByIdAndUpdate(id, author).exec()
   }

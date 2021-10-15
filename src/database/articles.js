@@ -31,5 +31,8 @@ class Article {
   delete(id) {
     return ArticleModel.findByIdAndDelete(id).exec()
   }
+  deleteByAuthorName(authorName) {
+    return ArticleModel.deleteMany({author: authorName}).exec()
+  }
 }
 module.exports = new Article()
