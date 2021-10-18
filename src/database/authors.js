@@ -1,12 +1,5 @@
 /* eslint-disable require-jsdoc */
-const mongoose = require('mongoose')
-const {Schema} = mongoose
-
-const AuthorsModelSchema = new Schema({
-  name: String,
-  articles: [String],
-})
-const AuthorsModel = mongoose.model('AuthorsModel', AuthorsModelSchema)
+const AuthorsModel = require('./author-model')
 
 class Authors {
   create(author) {

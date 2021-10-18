@@ -49,7 +49,8 @@ class Service {
         name: createdArticle.author,
         articles: [createdArticle._id],
       }
-      return await this.authorModel.create(newAuthor)
+      await this.authorModel.create(newAuthor)
+      return createdArticle
     }
 
     const authorsArticles = articleAuthor[0].articles
@@ -60,7 +61,7 @@ class Service {
       articles: authorsArticles,
     }
 
-    await this.authorModel.update(articleAuthor[0]._id, editedAuthor)
+    return await this.authorModel.update(articleAuthor[0]._id, editedAuthor)
   }
   async update(req) {
     const {id} = req.params
