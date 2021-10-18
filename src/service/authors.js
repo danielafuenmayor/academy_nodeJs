@@ -60,7 +60,7 @@ class Service {
     if (author === null) {
       throw new Error('Not found')
     }
-    const deleteArticles = await this.articleModel.deleteByAuthorName(author.name)
+    await this.articleModel.deleteByAuthorName(author.name)
     return await this.authorModel.delete(id)
   }
 }

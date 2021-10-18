@@ -14,6 +14,7 @@ authorsRouter.get('/', async (req, res) => {
     const authors = await service.list()
     logger.info(`[Authors][Get][Response] ${JSON.stringify(authors)}`)
     res.status(200).send(authors)
+    return authors
   } catch (err) {
     logger.info(`[Articles][Get][Error] ${err}`)
     res.status(500).send(JSON.parse(err))
@@ -33,6 +34,7 @@ authorsRouter.get('/:id', async (req, res) => {
     const author = await service.get(id)
     logger.info(`[Articles][List][Response] ${JSON.stringify(author)}`)
     res.status(200).send(author)
+    return author
     return
   } catch (err) {
     logger.info(`[Authors][List][Error] ${err}`)
@@ -47,6 +49,7 @@ authorsRouter.post('/', async (req, res) => {
     const createResult = await service.create(req)
     logger.info(`[Auhtors][Post][Response] ${createResult}`)
     res.status(200).send('Sucessfully created a new author')
+    return createResult
   } catch (err) {
     logger.info(`[Articles][Post][Error] ${err}`)
     res.status(500).send(err.message)
